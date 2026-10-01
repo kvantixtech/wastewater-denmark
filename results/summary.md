@@ -30,3 +30,18 @@ All checks passed.
 
 Based on measurement (levels 4–5): 553 of 4,195 outlets. Level 5 alone: 36.
 
+## Fixed nitrogen concentrations, overflows of combined sewage, 2024
+
+Outlets with at least 10,000 m³: 797, carrying 89.6 % of all overflow water. Nitrogen counts as fixed when it is within 0.5 kg of water × the concentration (`METHOD.md`).
+
+| Level | Outlets | Fixed at 12 mg/l | Their water | Fixed at 10 mg/l | Their water |
+|---|---|---|---|---|---|
+| 0 | 141 | 106 | 70.0 % | 5 | 7.4 % |
+| 1 | 48 | 30 | 82.4 % | 3 | 3.9 % |
+| 2 | 276 | 202 | 78.3 % | 24 | 6.8 % |
+| 3 | 138 | 73 | 58.8 % | 46 | 31.9 % |
+| 4 | 177 | 160 | 69.0 % | 6 | 11.3 % |
+| 5 | 16 | 5 | 7.7 % | 1 | 0.9 % |
+| not stated | 1 | 1 | 100.0 % | 0 | 0.0 % |
+| all | 797 | 577 | 62.0 % | 85 | 10.7 % |
+

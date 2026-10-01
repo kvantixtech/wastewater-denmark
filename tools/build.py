@@ -107,6 +107,26 @@ def main():
     meas = sum(lv[k]["outlets"] for k in ("4", "5") if k in lv)
     calc = sum(lv[k]["outlets"] for k in ("0", "1", "2", "3") if k in lv)
 
+    # ---- Fixed nitrogen concentrations (METHOD.md, added 2026-10-01)
+    FIX_MIN_M3 = 10000
+    def fixed_at(r, c):
+        w = num(r["udl_va_sta"])
+        return abs(num(r["udl_tn_sta"]) - c * w / 1000) <= 0.5
+    fix = defaultdict(lambda: {"outlets": 0, "water_m3": 0.0, "fixed12": 0, "water12_m3": 0.0, "fixed10": 0, "water10_m3": 0.0})
+    big = [r for r in comb if num(r["udl_va_sta"]) >= FIX_MIN_M3]
+    for r in big:
+        x = fix[level(r["ber_met"])]
+        w = num(r["udl_va_sta"])
+        x["outlets"] += 1; x["water_m3"] += w
+        if fixed_at(r, 12):
+            x["fixed12"] += 1; x["water12_m3"] += w
+        elif fixed_at(r, 10):
+            x["fixed10"] += 1; x["water10_m3"] += w
+    fix = {k: {kk: round(vv) for kk, vv in fix[k].items()} for k in sorted(fix)}
+    fix_tot = {kk: sum(v[kk] for v in fix.values()) for kk in ("outlets", "water_m3", "fixed12", "water12_m3", "fixed10", "water10_m3")}
+    fixed_conc = {"min_m3": FIX_MIN_M3, "by_level": fix, "total": fix_tot,
+                  "share_of_all_overflow_water": round(fix_tot["water_m3"] / sum(num(r["udl_va_sta"]) for r in comb), 3)}
+
     # ---- Per municipality
     per = {}
     for m in munis:
@@ -127,7 +147,8 @@ def main():
     site = {"years": years, "national": {t: {k: nat[t][k] for k in ("water", "n", "p", "bi5")} for t in DST_TYPES.values()},
             "y2024": {"plants": dict(got["plants"], count=len(rens)), "combined": dict(got["combined"], count=len(comb)),
                       "separate": dict(sums(sep), count=len(sep)), "levels_combined": lv, "level_names": LEVELS,
-                      "measured_outlets": meas, "calculated_outlets": calc, "level5_outlets": lv.get("5", {}).get("outlets", 0)},
+                      "measured_outlets": meas, "calculated_outlets": calc, "level5_outlets": lv.get("5", {}).get("outlets", 0),
+                      "fixed_conc": fixed_conc},
             "munis": per, "manifest": json.load(open(os.path.join(ROOT, "data", "manifest.json"), encoding="utf-8"))["downloaded_at_utc"]}
     os.makedirs(OUT, exist_ok=True)
     json.dump(site, open(os.path.join(OUT, "site.json"), "w", encoding="utf-8"), ensure_ascii=False, sort_keys=True, separators=(",", ":"))
@@ -144,6 +165,15 @@ def main():
     for k, x in lv.items():
         L.append(f"| {k} | {LEVELS.get(k, '')} | {x['outlets']:,} | {x['water_m3']:,} | {x['n_kg']:,} |")
     L += ["", f"Based on measurement (levels 4–5): {meas:,} of {len(comb):,} outlets. Level 5 alone: {site['y2024']['level5_outlets']:,}.", ""]
+    t = fixed_conc["total"]
+    L += ["## Fixed nitrogen concentrations, overflows of combined sewage, 2024", "",
+          f"Outlets with at least {FIX_MIN_M3:,} m³: {t['outlets']:,}, carrying {100 * fixed_conc['share_of_all_overflow_water']:.1f} % of all overflow water. "
+          "Nitrogen counts as fixed when it is within 0.5 kg of water × the concentration (`METHOD.md`).", "",
+          "| Level | Outlets | Fixed at 12 mg/l | Their water | Fixed at 10 mg/l | Their water |", "|---|---|---|---|---|---|"]
+    for k, x in list(fixed_conc["by_level"].items()) + [("all", t)]:
+        sw = lambda v: f"{100 * v / x['water_m3']:.1f} %" if x["water_m3"] else "–"
+        L.append(f"| {k} | {x['outlets']:,} | {x['fixed12']:,} | {sw(x['water12_m3'])} | {x['fixed10']:,} | {sw(x['water10_m3'])} |")
+    L.append("")
     open(os.path.join(OUT, "summary.md"), "w", encoding="utf-8").write("\n".join(L) + "\n")
     print("\n".join(L[8:12]))
     if problems:
