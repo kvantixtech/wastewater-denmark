@@ -38,6 +38,17 @@ Every download is saved unchanged in `data/raw/` with its SHA-256 in `data/manif
 - **Municipality:** DST's own names. Names in the layers are matched to them after removing "kommune" and changing case ("Københavns Kommune" → København, "Bornholms Regionskommune" → Bornholm). Outlets registered under Miljøstyrelsen rather than a municipality count in the national totals only.
 - **Units on the page:** water in m³ (or million m³), substances in tonnes (layer values are kg and are divided by 1,000).
 
+## Fixed nitrogen concentrations (added 2026-10-01, see `CHANGELOG.md`)
+
+The calculation level says how an outlet's figures were made. It does not say whether the nitrogen figure was measured on its own. Where the nitrogen in kg equals the water in m³ times one round concentration, the nitrogen figure was most likely made from the water figure.
+
+- **Outlets counted:** overflows of combined sewage with at least 10,000 m³ in 2024. Below that size, rounding of the kg figure makes the test uninformative. Above it, the test separates 12.0 from 11.95 or 12.05 mg/l. Also reported: how much of all overflow water these outlets carry.
+- **Fixed at 12 mg/l:** nitrogen (kg) is within 0.5 kg of water (m³) × 12 / 1,000. The layer gives nitrogen in whole kg.
+- **Fixed at 10 mg/l:** the same test with 10 instead of 12, for outlets not already fixed at 12.
+- **Reported:** by calculation level, the number of outlets in each group and their share of the water.
+
+This is a description of how the figures were made, not a judgement of whether they are right. A fixed concentration may be a reasonable standard value. Kvantix does not say where the values come from, because the source data does not say.
+
 ## Checks that must pass before anything is shown
 
 1. The 2024 sums of the plant layer must equal the national figures in DST VANDUD and in Punktkilder 2024 (water, N, P and BI5), each to the reported precision.
