@@ -1,0 +1,37 @@
+{
+ "downloaded_at_utc": "2026-10-01T04:49:55Z",
+ "files": {
+  "dst_vandud.csv": {
+   "sha256": "e6609adda15f084fb74b4aa807d42a916c43c63a3a58984e2156b422b64a4e5d",
+   "bytes": 2313399,
+   "source": "Danmarks Statistik, api.statbank.dk/v1/data, table VANDUD"
+  },
+  "dst_vandud_tableinfo.json": {
+   "sha256": "c1eed616182cfd05a03b10b414d2534f423afed1e730e64e41d9152e526355ee",
+   "bytes": 5159,
+   "source": "Danmarks Statistik, api.statbank.dk/v1/tableinfo, table VANDUD"
+  },
+  "rens_2024_schema.xsd": {
+   "sha256": "19d46ee5a91d463eea6cf69cc07f0497b0f87df867752ec47f7a085d039b4a79",
+   "bytes": 3905,
+   "source": "Miljøministeriet MiljøGIS WFS, vp4basis2026:vp4_ba_26_punkt_rens_saml"
+  },
+  "rens_2024.csv": {
+   "sha256": "b2ff90cf518a4f3be992bd6b90399d09aace0a6fa5d4ee18dea87a6926366606",
+   "bytes": 145159,
+   "source": "Miljøministeriet MiljøGIS WFS, vp4basis2026:vp4_ba_26_punkt_rens_saml (attributes, no geometry)",
+   "rows": 633
+  },
+  "rbu_2024_schema.xsd": {
+   "sha256": "2374b2e937bd62b09f3190bd8641ad2f5f28a1bbc53b40343250d9546b57d08d",
+   "bytes": 4208,
+   "source": "Miljøministeriet MiljøGIS WFS, vp4basis2026:vp4_ba_26_punkt_rbu_saml"
+  },
+  "rbu_2024.csv": {
+   "sha256": "44e5c14a9e1f809c06f9c45f77bb47395e3934e2e4ebbf9a3def3645c7abdd93",
+   "bytes": 5116159,
+   "source": "Miljøministeriet MiljøGIS WFS, vp4basis2026:vp4_ba_26_punkt_rbu_saml (attributes, no geometry)",
+   "rows": 20640
+  }
+ }
+}

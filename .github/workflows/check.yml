@@ -1,0 +1,24 @@
+name: check
+
+# Are the data files exactly the ones in the manifest, do the national checks in METHOD.md pass,
+# and are the published results exactly what tools/build.py produces?
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Data files match the manifest
+        run: |
+          python3 -c "
+          import hashlib, json
+          m = json.load(open('data/manifest.json'))
+          for f, v in m['files'].items():
+              got = hashlib.sha256(open('data/raw/' + f, 'rb').read()).hexdigest()
+              assert got == v['sha256'], f
+          print('all', len(m['files']), 'files match')"
+      - name: Checks and results are up to date
+        run: python3 tools/build.py && git diff --exit-code results/

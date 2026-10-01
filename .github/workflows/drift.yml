@@ -1,0 +1,45 @@
+name: drift
+
+# Once a month: download the sources again and compare with the committed files. If anything changed
+# (for example DST adds 2025 or corrects a year), an issue is opened. Nothing is committed automatically.
+on:
+  schedule:
+    - cron: "41 6 6 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  actions: write
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download again and compare
+        id: cmp
+        run: |
+          cp data/manifest.json /tmp/old_manifest.json
+          python3 tools/fetch.py
+          python3 - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
+          import json, os
+          old = json.load(open("/tmp/old_manifest.json"))["files"]; new = json.load(open("data/manifest.json"))["files"]
+          changed = [f for f in new if old.get(f, {}).get("sha256") != new[f]["sha256"]]
+          print("Changed files: " + (", ".join(changed) if changed else "none"))
+          open(os.environ["GITHUB_OUTPUT"], "a").write(f"changed={len(changed)}\n")
+          open("changed.md", "w").write("\n".join("- " + f for f in changed))
+          PY
+      - name: Open an issue when the sources changed
+        if: steps.cmp.outputs.changed != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create --title "Source data changed: $(date -u +%F)" --body "$(cat changed.md)
+
+          Run fetch.py and build.py locally, read the checks, and note the change in CHANGELOG.md before committing."
+      - name: Keep the schedule alive
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/$GITHUB_REPOSITORY/actions/workflows/drift.yml/enable" || true
